@@ -48,7 +48,7 @@ def process_webhook():
                     
     return 'EVENT_RECEIVED', 200
 
-# 3. FUNCIÓN PARA HABLAR CON WIT.AI
+# 3. FUNCIÓN PARA HABLAR CON WIT.AI Y RESPONDER COMO CALZADO CARIBU
 def consultar_wit_ai(texto):
     url = f"https://api.wit.ai/message?v=20260312&q={texto}"
     headers = {"Authorization": f"Bearer {WIT_TOKEN}"}
@@ -56,16 +56,36 @@ def consultar_wit_ai(texto):
     try:
         response = requests.get(url, headers=headers).json()
         
-        # Aquí Wit.ai nos devuelve la intención (intent) que configuraste en su página
         if 'intents' in response and len(response['intents']) > 0:
             intencion = response['intents'][0]['name']
-            return f"Mi IA detectó que tu intención es: {intencion}"
+            
+            # ==========================================
+            # DICCIONARIO DE RESPUESTAS DE CALZADO CARIBU
+            # ==========================================
+            respuestas = {
+                "saludo": "¡Hola! Bienvenido a Calzado Caribu 🥾. ¿En qué te podemos ayudar hoy?",
+                
+                "ubicacion": "Nuestra fábrica principal está en San Francisco del Rincón, Guanajuato. ¡Pero hacemos envíos a todo México! 📦",
+                
+                "comprar": "¡Excelente elección! Para hacer un pedido, compártenos el modelo que te gustó y tu código postal para revisar el envío.",
+                
+                "precio": "Tenemos excelentes precios de fábrica. Varían dependiendo de si buscas botas casuales o de trabajo industrial. ¿Qué estilo te interesa? 💸",
+                
+                "catalogo": "¡Claro que sí! Aquí puedes ver todos nuestros modelos disponibles: [Pega aquí el enlace a tu web o Facebook].",
+                
+                "asistente": "Soy el asistente virtual de Calzado Caribu, listo para ayudarte con tus compras."
+            }
+            
+            # Busca la respuesta correspondiente a la intención. 
+            # Si no la encuentra, da una respuesta genérica.
+            return respuestas.get(intencion, f"Entendí que tu mensaje trata sobre '{intencion}', pero un humano te dará más detalles en breve.")
+            
         else:
-            return "Lo siento, soy un bot en entrenamiento y no entendí tu mensaje."
+            return "Lo siento, soy el asistente virtual de Calzado Caribu y aún estoy aprendiendo. ¿Podrías escribir tu pregunta de otra forma?"
             
     except Exception as e:
         print("Error con Wit.ai:", e)
-        return "Tengo problemas de conexión con mi cerebro artificial en este momento."
+        return "Disculpa, tengo un pequeño problema técnico en este momento. Vuelvo enseguida."
 
 # 4. FUNCIÓN PARA ENVIAR EL MENSAJE DE VUELTA POR MESSENGER
 def enviar_mensaje(recipient_id, text):
