@@ -50,38 +50,35 @@ def process_webhook():
 
 # 3. FUNCIÓN PARA HABLAR CON WIT.AI Y RESPONDER COMO CALZADO CARIBU
 def consultar_wit_ai(texto):
-    url = f"https://api.wit.ai/message?v=20260312&q={texto}"
+    url = "https://api.wit.ai/message"
     headers = {"Authorization": f"Bearer {WIT_TOKEN}"}
     
+    # Esto arregla el problema de los espacios y signos de interrogación
+    parametros = {"v": "20260312", "q": texto}
+    
     try:
-        response = requests.get(url, headers=headers).json()
+        response = requests.get(url, headers=headers, params=parametros).json()
+        
+        # Esto nos chismeará en la pantalla negra de Render qué respondió Wit.ai
+        print("RESPUESTA DE WIT.AI:", response)
         
         if 'intents' in response and len(response['intents']) > 0:
             intencion = response['intents'][0]['name']
             
-            # ==========================================
-            # DICCIONARIO DE RESPUESTAS DE CALZADO CARIBU
-            # ==========================================
             respuestas = {
                 "saludo": "¡Hola! Bienvenido a Calzado Caribu 🥾. ¿En qué te podemos ayudar hoy?",
-                
                 "ubicacion": "Nuestra fábrica principal está en San Francisco del Rincón, Guanajuato. ¡Pero hacemos envíos a todo México! 📦",
-                
                 "comprar": "¡Excelente elección! Para hacer un pedido, compártenos el modelo que te gustó y tu código postal para revisar el envío.",
-                
                 "precio": "Tenemos excelentes precios de fábrica. Varían dependiendo de si buscas botas casuales o de trabajo industrial. ¿Qué estilo te interesa? 💸",
-                
-                "catalogo": "¡Claro que sí! Aquí puedes ver todos nuestros modelos disponibles: [Pega aquí el enlace a tu web o Facebook].",
-                
-                "asistente": "Soy el asistente virtual de Calzado Caribu, listo para ayudarte con tus compras."
+                "catalogo": "¡Claro que sí! Aquí puedes ver todos nuestros modelos disponibles: [Enlace].",
+                "asistente": "Soy el asistente virtual de Calzado Caribu, listo para ayudarte con tus compras.",
+                "agradecimiento": "¡De nada! Estamos para servirte en Calzado Caribu. 🥾"
             }
             
-            # Busca la respuesta correspondiente a la intención. 
-            # Si no la encuentra, da una respuesta genérica.
-            return respuestas.get(intencion, f"Entendí que tu mensaje trata sobre '{intencion}', pero un humano te dará más detalles en breve.")
+            return respuestas.get(intencion, f"Entendí que tu intención es '{intencion}', pero me falta agregarle su respuesta en el código de VS Code.")
             
         else:
-            return "Lo siento, soy el asistente virtual de Calzado Caribu y aún estoy aprendiendo. ¿Podrías escribir tu pregunta de otra forma?"
+            return "Lo siento, soy un asistente virtual y aún estoy aprendiendo. ¿Podrías escribir tu pregunta de otra forma, por favor?"
             
     except Exception as e:
         print("Error con Wit.ai:", e)
